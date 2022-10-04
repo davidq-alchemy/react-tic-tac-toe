@@ -32,6 +32,13 @@ export function getWinner(board) {
   return undefined;
 }
 
+function isBoardFull(board) {
+  for (const content of board) {
+    if (content === '') return false;
+  }
+  return true;
+}
+
 export function GameContextProvider({ children }) {
   const [board, setBoard] = useState(new Array(9).fill(''));
   const [currentPlayer, setCurrentPlayer] = useState('X');
@@ -52,11 +59,16 @@ export function GameContextProvider({ children }) {
     newBoard[n] = currentPlayer;
     setBoard(newBoard);
 
+
     const winner = getWinner(newBoard);
     if (winner) {
       setGameInProgress(false);
       setGameMessage(`${winner} won`);
-    } else {
+    } else if (isBoardFull(newBoard)) {
+      setGameInProgress(false);
+      setGameMessage("It's a cat's game");
+    }
+    else {
       const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
       setCurrentPlayer(nextPlayer);
       setGameMessage(`Your turn ${nextPlayer}`);
