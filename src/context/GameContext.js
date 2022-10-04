@@ -5,29 +5,29 @@ const GameContext = createContext();
 export function GameContextProvider({ children }) {
   const [board, setBoard] = useState(new Array(9).fill(''));
   const [currentPlayer, setCurrentPlayer] = useState('X');
-  const [gameOver, setGameOver] = useState(true);
+  const [gameOver, setGameOver] = useState(false);
   const [gameMessage, setGameMessage] = useState('Your turn X');
   const [computer, setComputer] = useState('');
 
   function newGame() {
     setBoard(new Array(9).fill(''));
     setCurrentPlayer('X');
-    setGameOver(true);
+    setGameOver(false);
     setGameMessage('Your turn X');
   }
 
   function setStateFromMove(position) {
-    if (board[position] !== '' || !gameOver) return;
+    if (board[position] !== '' || gameOver) return;
 
     const nextBoard = makeMove(board, currentPlayer, position);
     setBoard(nextBoard);
 
     const winner = getWinner(nextBoard);
     if (winner) {
-      setGameOver(false);
+      setGameOver(true);
       setGameMessage(`${winner} won`);
     } else if (isBoardFull(nextBoard)) {
-      setGameOver(false);
+      setGameOver(true);
       setGameMessage("It's a cat's game");
     }
     else {
@@ -37,7 +37,7 @@ export function GameContextProvider({ children }) {
     }
   }
 
-  if (currentPlayer === computer && gameOver) {
+  if (currentPlayer === computer && !gameOver) {
     const move = pickMove(board, currentPlayer);
     setStateFromMove(move);
   }
