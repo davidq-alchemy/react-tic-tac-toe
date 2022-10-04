@@ -1,11 +1,13 @@
-import './App.css';
+import styles from './App.module.css';
 import Board from './components/Board/Board';
 import { useGame } from './context/GameContext';
 
 function App() {
   const { board } = useGame();
 
-  return <Board board={board} />;
+  return <div className={styles.app}>
+    <Board board={board} />
+  </div>;
 }
 
 export default App;
