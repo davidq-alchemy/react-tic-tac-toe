@@ -37,12 +37,15 @@ export function GameContextProvider({ children }) {
     }
   }
 
+  // If we're rendering and it's the computer's turn,
+  // let the computer play their turn and immediately re-render.
   if (currentPlayer === computer && !gameOver) {
     const move = pickMove(board, currentPlayer);
     setStateFromMove(move);
   }
 
-  function chooseSquare(position) {
+  // Handler for human player interaction.
+  function playerChoseSquare(position) {
     setStateFromMove(position);
   }
 
@@ -54,7 +57,7 @@ export function GameContextProvider({ children }) {
       gameMessage,
       computer,
       setComputer,
-      chooseSquare,
+      playerChoseSquare,
       newGame
     }}
   >
@@ -69,6 +72,10 @@ export function useGame() {
   }
   return gameContextValue;
 }
+
+/*
+ * Utility functions.
+ */
 
 function makeMove(board, player, position) {
   if (board[position] !== '') return;

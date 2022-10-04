@@ -2,11 +2,11 @@ import styles from './Square.module.css';
 import { useGame } from '../../context/GameContext';
 
 export default function Square({ value, position }) {
-  const { chooseSquare } = useGame();
+  const { playerChoseSquare } = useGame();
 
   return <div
     className={styles.square}
-    onClick={() => chooseSquare(position)}
+    onClick={() => playerChoseSquare(position)}
   >
     {value}
   </div>;
