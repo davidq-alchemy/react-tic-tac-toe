@@ -1,9 +1,14 @@
 .container {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    grid-template-areas: "empty message button";
+    grid-template-areas: "ai message button";
     justify-items: center;
     align-items: center;
+}
+
+.aiSelect {
+    grid-area: ai;
+    padding: 5px;
 }
 
 .message {

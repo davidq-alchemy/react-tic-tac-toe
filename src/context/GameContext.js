@@ -7,6 +7,7 @@ export function GameContextProvider({ children }) {
   const [currentPlayer, setCurrentPlayer] = useState('X');
   const [gameOver, setGameOver] = useState(true);
   const [gameMessage, setGameMessage] = useState('Your turn X');
+  const [computer, setComputer] = useState('');
 
   function newGame() {
     setBoard(new Array(9).fill(''));
@@ -15,10 +16,10 @@ export function GameContextProvider({ children }) {
     setGameMessage('Your turn X');
   }
 
-  function chooseSquare(n) {
-    if (board[n] !== '' || !gameOver) return;
+  function setStateFromMove(position) {
+    if (board[position] !== '' || !gameOver) return;
 
-    const nextBoard = makeMove(board, currentPlayer, n);
+    const nextBoard = makeMove(board, currentPlayer, position);
     setBoard(nextBoard);
 
     const winner = getWinner(nextBoard);
@@ -36,7 +37,14 @@ export function GameContextProvider({ children }) {
     }
   }
 
-  console.log('best move is ' + pickMove(board, currentPlayer));
+  if (currentPlayer === computer && gameOver) {
+    const move = pickMove(board, currentPlayer);
+    setStateFromMove(move);
+  }
+
+  function chooseSquare(position) {
+    setStateFromMove(position);
+  }
 
   return <GameContext.Provider
     value={{
@@ -44,6 +52,8 @@ export function GameContextProvider({ children }) {
       currentPlayer,
       gameOver,
       gameMessage,
+      computer,
+      setComputer,
       chooseSquare,
       newGame
     }}
