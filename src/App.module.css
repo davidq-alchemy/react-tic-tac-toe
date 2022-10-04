@@ -3,3 +3,7 @@
     max-width: 640px;
     margin: auto;
 }
+
+.centeredText {
+    text-align: center;
+}

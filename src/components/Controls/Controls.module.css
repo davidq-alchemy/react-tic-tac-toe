@@ -1,0 +1,17 @@
+.container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-areas: "empty message button";
+    justify-items: center;
+    align-items: center;
+}
+
+.message {
+    grid-area: message;
+    font-size: 1.2rem;
+}
+
+.button {
+    grid-area: button;
+    padding: 5px;
+}
