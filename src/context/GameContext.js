@@ -75,6 +75,8 @@ export function GameContextProvider({ children }) {
     }
   }
 
+  console.log('best move is ' + pickMove(board, currentPlayer));
+
   return <GameContext.Provider
     value={{
       board,
@@ -95,4 +97,63 @@ export function useGame() {
     throw new Error('useGame() called outside of a GameContextProvider');
   }
   return gameContextValue;
+}
+
+function pickMove(board, player) {
+  let bestMove = { value: Number.NEGATIVE_INFINITY, position: -1 };
+  for (let i = 0; i < board.length; i++) {
+    if (board[i] === '') {
+      const newBoard = [...board];
+      newBoard[i] = player;
+      const nextPlayer = player === 'X' ? 'O' : 'X';
+      const moveValue = minimax({ board: newBoard, player: nextPlayer }, player);
+      if (moveValue > bestMove.value) {
+        bestMove = { value: moveValue, position: i };
+      }
+    }
+  }
+
+  return bestMove.position;
+}
+
+function minimax(node, maximizingPlayer) {
+  const { board, player } = node;
+
+  const winner = getWinner(board);
+  if (winner) {
+    return winner === maximizingPlayer ? 1 : -1;
+  } else if (isBoardFull(board)) {
+    return 0;
+  }
+
+  function makeMove(index) {
+    if (board[index] !== '') return null;
+
+    const nextBoard = [...board];
+    nextBoard[index] = player;
+    const nextPlayer = player === 'X' ? 'O' : 'X';
+
+    return { board: nextBoard, player: nextPlayer };
+  }
+
+  let value;
+  if (maximizingPlayer === player) {
+    value = Number.NEGATIVE_INFINITY;
+    for (let i = 0; i < board.length; i++) {
+      const node = makeMove(i);
+      if (!node) continue;
+
+      value = Math.max(value, minimax(node, maximizingPlayer));
+    }
+  } else {
+    value = Number.POSITIVE_INFINITY;
+    for (let i = 0; i < board.length; i++) {
+      const node = makeMove(i);
+      if (!node) continue;
+
+      value = Math.min(value, minimax(node, maximizingPlayer));
+    }
+  }
+
+  return value;
 }
