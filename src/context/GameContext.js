@@ -113,7 +113,7 @@ function pickMove(board, player) {
   return bestMove.position;
 }
 
-function minimax(board, currentPlayer, maximizingPlayer) {
+function minimax(board, currentPlayer, maximizingPlayer, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY) {
   const winner = getWinner(board);
   if (winner) {
     return winner === maximizingPlayer ? 1 : -1;
@@ -128,7 +128,9 @@ function minimax(board, currentPlayer, maximizingPlayer) {
       const nextBoard = makeMove(board, currentPlayer, i);
       if (!nextBoard) continue;
 
-      value = Math.max(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer));
+      value = Math.max(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer, alpha, beta));
+      if (value >= beta) break;
+      alpha = Math.max(alpha, value);
     }
   } else {
     value = Number.POSITIVE_INFINITY;
@@ -136,7 +138,9 @@ function minimax(board, currentPlayer, maximizingPlayer) {
       const nextBoard = makeMove(board, currentPlayer, i);
       if (!nextBoard) continue;
 
-      value = Math.min(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer));
+      value = Math.min(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer, alpha, beta));
+      if (value <= alpha) break;
+      beta = Math.min(beta, value);
     }
   }
 
