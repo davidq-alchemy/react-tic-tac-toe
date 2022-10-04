@@ -82,33 +82,13 @@ function togglePlayer(player) {
   return player === 'X' ? 'O' : 'X';
 }
 
+const winningSequences = [[0, 1, 2], [3, 4, 5], [6, 7, 8], [0, 3, 6], [1, 4, 7], [2, 5, 8], [0, 4, 8], [2, 4, 6]];
 export function getWinner(board) {
-  function isWinningSequence(t1, t2, t3) {
-    return t1 !== '' && t1 === t2 && t2 === t3;
+  for (const sequence of winningSequences) {
+    const [i, j, k] = sequence;
+    if (board[i] !== '' && board[i] === board[j] && board[j] === board[k])
+      return board[i];
   }
-
-  for (let i = 0; i < 3; i++) {
-    const rowStart = i * 3;
-    if (isWinningSequence(board[rowStart], board[rowStart + 1], board[rowStart + 2])) {
-      return board[rowStart];
-    }
-  }
-
-  for (let i = 0; i < 3; i++) {
-    const columnStart = i;
-    if (isWinningSequence(board[columnStart], board[columnStart + 3], board[columnStart + 6])) {
-      return board[columnStart];
-    }
-  }
-
-  if (isWinningSequence(board[0], board[4], board[8])) {
-    return board[0];
-  }
-
-  if (isWinningSequence(board[6], board[4], board[2])) {
-    return board[6];
-  }
-
   return undefined;
 }
 
