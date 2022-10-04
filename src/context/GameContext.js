@@ -2,6 +2,76 @@ const { createContext, useContext, useState } = require('react');
 
 const GameContext = createContext();
 
+export function GameContextProvider({ children }) {
+  const [board, setBoard] = useState(new Array(9).fill(''));
+  const [currentPlayer, setCurrentPlayer] = useState('X');
+  const [gameOver, setGameOver] = useState(true);
+  const [gameMessage, setGameMessage] = useState('Your turn X');
+
+  function newGame() {
+    setBoard(new Array(9).fill(''));
+    setCurrentPlayer('X');
+    setGameOver(true);
+    setGameMessage('Your turn X');
+  }
+
+  function chooseSquare(n) {
+    if (board[n] !== '' || !gameOver) return;
+
+    const nextBoard = makeMove(board, currentPlayer, n);
+    setBoard(nextBoard);
+
+    const winner = getWinner(nextBoard);
+    if (winner) {
+      setGameOver(false);
+      setGameMessage(`${winner} won`);
+    } else if (isBoardFull(nextBoard)) {
+      setGameOver(false);
+      setGameMessage("It's a cat's game");
+    }
+    else {
+      const nextPlayer = togglePlayer(currentPlayer);
+      setCurrentPlayer(nextPlayer);
+      setGameMessage(`Your turn ${nextPlayer}`);
+    }
+  }
+
+  console.log('best move is ' + pickMove(board, currentPlayer));
+
+  return <GameContext.Provider
+    value={{
+      board,
+      currentPlayer,
+      gameOver,
+      gameMessage,
+      chooseSquare,
+      newGame
+    }}
+  >
+    {children}
+  </GameContext.Provider>;
+}
+
+export function useGame() {
+  const gameContextValue = useContext(GameContext);
+  if (!gameContextValue) {
+    throw new Error('useGame() called outside of a GameContextProvider');
+  }
+  return gameContextValue;
+}
+
+function makeMove(board, player, position) {
+  if (board[position] !== '') return;
+
+  const newBoard = [...board];
+  newBoard[position] = player;
+  return newBoard;
+}
+
+function togglePlayer(player) {
+  return player === 'X' ? 'O' : 'X';
+}
+
 export function getWinner(board) {
   function isWinningSequence(t1, t2, t3) {
     return t1 !== '' && t1 === t2 && t2 === t3;
@@ -33,92 +103,27 @@ export function getWinner(board) {
 }
 
 function isBoardFull(board) {
-  for (const content of board) {
-    if (content === '') return false;
-  }
-  return true;
-}
-
-export function GameContextProvider({ children }) {
-  const [board, setBoard] = useState(new Array(9).fill(''));
-  const [currentPlayer, setCurrentPlayer] = useState('X');
-  const [gameInProgress, setGameInProgress] = useState(true);
-  const [gameMessage, setGameMessage] = useState('Your turn X');
-
-  function newGame() {
-    setBoard(new Array(9).fill(''));
-    setCurrentPlayer('X');
-    setGameInProgress(true);
-    setGameMessage('Your turn X');
-  }
-
-  function chooseSquare(n) {
-    if (board[n] !== '' || !gameInProgress) return;
-
-    const newBoard = [...board];
-    newBoard[n] = currentPlayer;
-    setBoard(newBoard);
-
-
-    const winner = getWinner(newBoard);
-    if (winner) {
-      setGameInProgress(false);
-      setGameMessage(`${winner} won`);
-    } else if (isBoardFull(newBoard)) {
-      setGameInProgress(false);
-      setGameMessage("It's a cat's game");
-    }
-    else {
-      const nextPlayer = currentPlayer === 'X' ? 'O' : 'X';
-      setCurrentPlayer(nextPlayer);
-      setGameMessage(`Your turn ${nextPlayer}`);
-    }
-  }
-
-  console.log('best move is ' + pickMove(board, currentPlayer));
-
-  return <GameContext.Provider
-    value={{
-      board,
-      currentPlayer,
-      gameInProgress,
-      gameMessage,
-      chooseSquare,
-      newGame
-    }}
-  >
-    {children}
-  </GameContext.Provider>;
-}
-
-export function useGame() {
-  const gameContextValue = useContext(GameContext);
-  if (!gameContextValue) {
-    throw new Error('useGame() called outside of a GameContextProvider');
-  }
-  return gameContextValue;
+  return !board.includes('');
 }
 
 function pickMove(board, player) {
-  let bestMove = { value: Number.NEGATIVE_INFINITY, position: -1 };
+  let bestMove = { value: Number.NEGATIVE_INFINITY, position: undefined };
+
   for (let i = 0; i < board.length; i++) {
-    if (board[i] === '') {
-      const newBoard = [...board];
-      newBoard[i] = player;
-      const nextPlayer = player === 'X' ? 'O' : 'X';
-      const moveValue = minimax({ board: newBoard, player: nextPlayer }, player);
-      if (moveValue > bestMove.value) {
-        bestMove = { value: moveValue, position: i };
-      }
+    const nextBoard = makeMove(board, player, i);
+    if (!nextBoard) continue;
+
+    const moveValue = minimax(nextBoard, togglePlayer(player), player);
+
+    if (moveValue > bestMove.value) {
+      bestMove = { value: moveValue, position: i };
     }
   }
 
   return bestMove.position;
 }
 
-function minimax(node, maximizingPlayer) {
-  const { board, player } = node;
-
+function minimax(board, currentPlayer, maximizingPlayer) {
   const winner = getWinner(board);
   if (winner) {
     return winner === maximizingPlayer ? 1 : -1;
@@ -126,32 +131,22 @@ function minimax(node, maximizingPlayer) {
     return 0;
   }
 
-  function makeMove(index) {
-    if (board[index] !== '') return null;
-
-    const nextBoard = [...board];
-    nextBoard[index] = player;
-    const nextPlayer = player === 'X' ? 'O' : 'X';
-
-    return { board: nextBoard, player: nextPlayer };
-  }
-
   let value;
-  if (maximizingPlayer === player) {
+  if (maximizingPlayer === currentPlayer) {
     value = Number.NEGATIVE_INFINITY;
     for (let i = 0; i < board.length; i++) {
-      const node = makeMove(i);
-      if (!node) continue;
+      const nextBoard = makeMove(board, currentPlayer, i);
+      if (!nextBoard) continue;
 
-      value = Math.max(value, minimax(node, maximizingPlayer));
+      value = Math.max(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer));
     }
   } else {
     value = Number.POSITIVE_INFINITY;
     for (let i = 0; i < board.length; i++) {
-      const node = makeMove(i);
-      if (!node) continue;
+      const nextBoard = makeMove(board, currentPlayer, i);
+      if (!nextBoard) continue;
 
-      value = Math.min(value, minimax(node, maximizingPlayer));
+      value = Math.min(value, minimax(nextBoard, togglePlayer(currentPlayer), maximizingPlayer));
     }
   }
 
