@@ -104,7 +104,7 @@ function isBoardFull(board) {
 }
 
 function pickMove(board, player) {
-  let bestMove = { value: Number.NEGATIVE_INFINITY, position: undefined };
+  let optimalMoves = { moves: undefined, value: Number.NEGATIVE_INFINITY };
 
   for (let i = 0; i < board.length; i++) {
     const nextBoard = makeMove(board, player, i);
@@ -112,12 +112,15 @@ function pickMove(board, player) {
 
     const moveValue = minimax(nextBoard, togglePlayer(player), player);
 
-    if (moveValue > bestMove.value) {
-      bestMove = { value: moveValue, position: i };
+    if (moveValue > optimalMoves.value) {
+      optimalMoves = { moves: [i], value: moveValue };
+    } else if (moveValue === optimalMoves.value) {
+      optimalMoves.moves.push(i);
     }
   }
 
-  return bestMove.position;
+  const moves = optimalMoves.moves;
+  return moves[Math.floor(Math.random() * moves.length)];
 }
 
 function minimax(board, currentPlayer, maximizingPlayer, alpha = Number.NEGATIVE_INFINITY, beta = Number.POSITIVE_INFINITY) {
