@@ -39,7 +39,7 @@ export function GameContextProvider({ children }) {
 
   // If we're rendering and it's the computer's turn,
   // let the computer play their turn and immediately re-render.
-  if (currentPlayer === computer && !gameOver) {
+  if (!gameOver && (computer === currentPlayer || computer === 'both')) {
     const move = pickMove(board, currentPlayer);
     setStateFromMove(move);
   }

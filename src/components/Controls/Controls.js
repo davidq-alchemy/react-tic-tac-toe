@@ -13,6 +13,7 @@ export default function Controls() {
       <option value="">No Computer</option>
       <option value="O">Computer O</option>
       <option value="X">Computer X</option>
+      <option value="both">Two Computers</option>
     </select>
     <p className={styles.message}>{gameMessage}</p>
     <button
