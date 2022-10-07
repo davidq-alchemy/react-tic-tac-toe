@@ -1,0 +1,8 @@
+.square {
+    background-color: rgb(15, 179, 255);
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 3rem;
+}

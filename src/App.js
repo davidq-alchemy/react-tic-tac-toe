@@ -1,25 +1,13 @@
-import logo from './logo.svg';
-import './App.css';
+import styles from './App.module.css';
+import Board from './components/Board/Board';
+import Controls from './components/Controls/Controls';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+  return <div className={styles.app}>
+    <h1 className={styles.centeredText}>Tic-tac-toe</h1>
+    <Controls />
+    <Board />
+  </div>;
 }
 
 export default App;
