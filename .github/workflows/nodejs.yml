@@ -3,11 +3,7 @@
 
 name: Node.js CI
 
-on:
-  push:
-    branches: [master, main, dev]
-  pull_request:
-    branches: [master, main]
+on: [push, pull_request]
 
 jobs:
   build:
@@ -15,7 +11,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x]
+        node-version: [18.x]
 
     steps:
       - uses: actions/checkout@v2
@@ -23,10 +19,7 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: npm install --dev
-      - run: npx eslint .
-      - run: npm test --passWithNoTests
-        env:
-          CI: true
-          REACT_APP_SUPABASE_URL: ${{ secrets.REACT_APP_SUPABASE_URL }}
-          REACT_APP_SUPABASE_KEY: ${{ secrets.REACT_APP_SUPABASE_KEY }}
+      - run: npm ci
+      - run: npm run lint
+      - run: npm run test
+      - run: npm run build
